@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christ the King Church | Traditional Latin Mass</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <script defer src="script.js"></script>
+    <script defer src="saints.js"></script>
+</head>
+<body>
+    <header id="navbar">
+        <div class="container nav-content">
+            <div class="logo-container">
+                <div class="logo-text">
+                    <h1 style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--secondary-color); font-size: 1.8rem;">&dagger;</span> 
+                        Christ the King
+                    </h1>
+                    <span>Catholic Church</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#schedule">Schedule</a></li>
+                    <li><a href="#location">Location</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero fade-in">
+        <div class="hero-bg" style="background-image: url('assets/altar_background.png');"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="slide-up">Welcome to</h2>
+            <h1 class="slide-up delay-1">Christ the King Church</h1>
+            <p class="slide-up delay-2">Preserving the Immemorial Tradition of the Roman Rite</p>
+            <a href="#schedule" class="btn slide-up delay-3">View Mass Schedule</a>
+        </div>
+    </section>
+
+    <div class="container main-layout section">
+        <!-- Main Content Column -->
+        <main class="content-col">
+            
+            <section id="about" class="fade-in-scroll">
+                <h2>Our Chapel</h2>
+                <div class="divider"></div>
+                <p>Welcome to Christ the King Church, located in the serene village of Christurajapuram, Marthandam, in the Kanyakumari district of Tamil Nadu. For over 35 years, our chapel has stood as a bastion of the traditional Catholic faith in Southern India.</p>
+                <p>We are exclusively dedicated to the Holy Sacrifice of the Mass in its immemorial Roman Rite (the 1962 Missal), ensuring that the timeless liturgy, traditional sacraments, and unmodified teachings of the Church prior to Vatican II are preserved and passed down to future generations.</p>
+                <p style="margin-top: 15px; font-weight: 600; color: var(--primary-color);">Our chapel is run by the priests of the Society of Saint Pius X (SSPX).</p>
+            </section>
+
+            <section id="schedule" class="mt-50 fade-in-scroll">
+                <h2>Mass & Devotion Schedule</h2>
+                <div class="divider"></div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab('regular')">Regular Schedule</button>
+                    <button class="tab-btn" onclick="openTab('special')">Special Occasions</button>
+                </div>
+
+                <div id="regular" class="tab-content active">
+                    <div class="schedule-grid">
+                        <div class="schedule-card">
+                            <h3>First Sunday</h3>
+                            <p><strong>7:00 AM</strong> - Rosary & Confessions</p>
+                            <p><strong>7:30 AM</strong> - Holy Mass</p>
+                        </div>
+                        <div class="schedule-card">
+                            <h3>Other Sundays</h3>
+                            <p><strong>11:00 AM</strong> - Rosary & Confessions</p>
+                            <p><strong>11:30 AM</strong> - Holy Mass</p>
+                        </div>
+                        <div class="schedule-card">
+                            <h3>Weekdays (Mon-Fri)</h3>
+                            <p><strong>5:30 PM</strong> - Holy Rosary</p>
+                            <p><em>(No Daily Mass)</em></p>
+                        </div>
+                        <div class="schedule-card">
+                            <h3>First Saturday</h3>
+                            <p><strong>6:00 PM</strong> - First Saturday Devotions</p>
+                        </div>
+                    </div>
+                    <p class="schedule-note">* Confessions always begin 30 minutes before every scheduled Mass.</p>
+                </div>
+
+                <div id="special" class="tab-content" style="display: none;">
+                    <div class="schedule-card full-width">
+                        <h3>Upcoming Special Occasions</h3>
+                        <p>No special occasions scheduled at this moment. Please check back later for updates on feast days, Holy Week schedules, and other special Masses.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="location" class="mt-50 fade-in-scroll">
+                <h2>Location</h2>
+                <div class="divider"></div>
+                <p><strong>Address:</strong> Christurajapuram, Marthandam, Kanyakumari District, Tamil Nadu, India.</p>
+                <div class="map-container mt-20">
+                    <iframe src="https://www.google.com/maps?q=8.2817484,77.1966666&output=embed" width="100%" height="350" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Sidebar Column -->
+        <aside class="sidebar-col fade-in-scroll delay-1">
+            <div class="sidebar-widget">
+                <h3 class="widget-title" id="widget-title-text">Saint of the Day</h3>
+                <div class="widget-content" id="saint-widget">
+                    <p class="saint-date" id="saint-date">Loading date...</p>
+                    <h4 class="saint-name" id="saint-name">Loading saint...</h4>
+                    <img id="saint-image" src="assets/church_exterior.png" alt="Saint Image" class="saint-img-small" style="display:none;">
+                    <p class="saint-desc" id="saint-desc">Please wait while we load the liturgical calendar.</p>
+                    <a href="saint-details.html" id="saint-link" class="read-more">Read More &rarr;</a>
+                </div>
+            </div>
+
+            <div class="sidebar-widget mt-30">
+                <h3 class="widget-title">Liturgical Note</h3>
+                <div class="widget-content">
+                    <p>All masses and liturgical observances at Christ the King Church follow the traditional 1962 Roman Missal.</p>
+                </div>
+            </div>
+
+            <div class="sidebar-widget mt-30" style="background: transparent; border: none; box-shadow: none;">
+                <img src="assets/church_exterior.png" alt="Christ the King Church Exterior" style="width: 100%; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            </div>
+
+            <div class="sidebar-widget mt-30" style="background: #e8f5e9; border-top: 4px solid #25D366; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.15);">
+                <h3 class="widget-title" style="color: #075E54; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px;">Community Updates</h3>
+                <div class="widget-content">
+                    <p style="margin-bottom: 15px; color: #333; font-size: 0.95rem;">Join our official WhatsApp group for the latest updates, announcements, and schedule changes.</p>
+                    <a href="https://chat.whatsapp.com/Itsai6JZWXBFCiETF4rMDh?mode=gi_t" target="_blank" class="btn" style="background: #25D366; color: white; display: block; text-align: center; font-weight: bold; padding: 12px; border-radius: 5px; text-decoration: none;">Join WhatsApp Group</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <footer id="contact">
+        <div class="container footer-content fade-in-scroll">
+            <div class="footer-info">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom: 20px;">
+                    <span style="color: var(--secondary-color); font-size: 1.8rem;">&dagger;</span>
+                    <h3 style="margin:0;">Christ the King Church</h3>
+                </div>
+                <p>Christurajapuram, Marthandam</p>
+                <p>Kanyakumari District, Tamil Nadu</p>
+                <p>India</p>
+            </div>
+            <div class="footer-links">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#schedule">Schedule & Mass Times</a></li>
+                    <li><a href="#location">Directions</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>SSPX Links</h3>
+                <ul>
+                    <li><a href="https://sspx.asia" target="_blank">SSPX Asia</a></li>
+                    <li><a href="https://sspx.org" target="_blank">SSPX USA</a></li>
+                    <li><a href="https://fsspx.uk" target="_blank">SSPX UK</a></li>
+                    <li><a href="https://fsspx.org/en" target="_blank">SSPX Europe</a></li>
+                    <li><a href="https://fsspx.africa/en" target="_blank">SSPX Africa</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Christ the King Church. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liturgical Details | Christ the King Church</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header id="navbar" class="scrolled">
+        <div class="container nav-content">
+            <div class="logo-container">
+                <div class="logo-text">
+                    <h1 style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--secondary-color); font-size: 1.8rem;">&dagger;</span> 
+                        Christ the King
+                    </h1>
+                    <span>Catholic Church</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#schedule">Schedule</a></li>
+                    <li><a href="index.html#location">Location</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container main-layout section" style="margin-top: 100px; min-height: 60vh;">
+        <main class="content-col fade-in">
+            <h4 id="detail-date" style="color: var(--primary-color); font-family: var(--font-heading); text-transform: uppercase;">Loading Date...</h4>
+            
+            <div id="sunday-content" style="display: none; margin-bottom: 40px;">
+                <h1 id="sunday-name" style="font-size: 3rem; margin-bottom: 5px; color: var(--primary-color);">Sunday</h1>
+                <p id="sunday-desc" style="font-size: 1.15rem; line-height: 1.8; color: #444; margin-top: 20px; font-style: italic;"></p>
+                
+                <h3 style="margin-top: 30px; font-family: var(--font-heading); color: var(--text-main);">Mass Propers</h3>
+                <div class="divider" style="margin: 10px 0;"></div>
+                <div id="sunday-mass" style="font-size: 1.05rem; line-height: 1.8; color: #333; background: #fff; padding: 25px; border-radius: 5px; border-left: 4px solid var(--secondary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05);"></div>
+            </div>
+
+            <div id="saint-content" style="display: none; margin-bottom: 40px;">
+                <h1 id="saint-name" style="font-size: 2.5rem; margin-bottom: 5px; color: var(--primary-color);">Saint Name</h1>
+                <h3 id="saint-title" style="font-family: var(--font-subheading); font-style: italic; color: #666; margin-bottom: 15px;">Title</h3>
+                <div class="divider"></div>
+                <p id="saint-text" style="font-size: 1.15rem; line-height: 1.8; color: #444; margin-top: 20px;"></p>
+                
+                <h3 id="saint-mass-header" style="margin-top: 40px; font-family: var(--font-heading); color: var(--text-main);">Mass Propers</h3>
+                <div id="saint-mass-divider" class="divider" style="margin: 10px 0;"></div>
+                <div id="saint-mass" style="font-size: 1.05rem; line-height: 1.8; color: #333; background: #fff; padding: 25px; border-radius: 5px; border-left: 4px solid var(--secondary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05);"></div>
+            </div>
+
+            <a href="index.html" class="btn" style="margin-top: 40px;">&larr; Back to Home</a>
+        </main>
+    </div>
+
+    <footer id="contact">
+        <div class="container footer-content fade-in-scroll">
+            <div class="footer-info">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom: 20px;">
+                    <span style="color: var(--secondary-color); font-size: 1.8rem;">&dagger;</span>
+                    <h3 style="margin:0;">Christ the King Church</h3>
+                </div>
+                <p>Christurajapuram, Marthandam</p>
+                <p>Kanyakumari District, Tamil Nadu</p>
+                <p>India</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Christ the King Church. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="saints.js"></script>
+
+</body>
+</html>

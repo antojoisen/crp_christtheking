@@ -25,11 +25,12 @@ export async function onRequestGet({request,env}) {
     }
     if(kind==="propers") {
       const date=url.searchParams.get("date");
-      if(!/^\d{4}-\d{2}-\d{2}$/.test(date||""))return json({error:"A valid date is required."},400);
-      const result=await env.CHRISTTHEKING_DB.prepare("SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language").bind(date).all();
+      const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+      if(date!==today)return json({error:"Only today's Mass Propers are available on the public site. Open Feast of the Day for today's texts."},403);
+      const result=await env.CHRISTTHEKING_DB.prepare("SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language").bind(today).all();
       const items={};
       for(const row of (result.results||[]))items[row.language]={data:JSON.parse(row.raw_texts_json),syncedAt:row.synced_at,missing:JSON.parse(row.missing_json||"[]")};
-      return json({date,items,available:Object.keys(items)});
+      return json({date:today,items,available:Object.keys(items)});
     }
     if(kind==="calendar") {
       const now=new Date();

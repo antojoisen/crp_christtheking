@@ -16,6 +16,7 @@ function showDashboard(){ $("auth-view").hidden=true; $("dashboard").hidden=fals
 function showLogin(msg="Please sign in to continue."){$("dashboard").hidden=true;$("auth-view").hidden=false;$("auth-message").textContent=msg;}
 function activateView(name){document.querySelectorAll(".admin-nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===name));document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!=="view-"+name);if(name==="announcements")loadAnnouncements();if(name==="schedules")loadSchedules();if(name==="activity")loadActivity();}
 document.querySelectorAll(".admin-nav button").forEach(b=>b.addEventListener("click",()=>activateView(b.dataset.view)));
+$("open-propers").addEventListener("click",()=>activateView("propers"));
 async function initialize(){try{const s=await api("../api/auth/me");if(s.authenticated){showDashboard();return;}}catch{}showLogin();}
 $("login-form").addEventListener("submit",async e=>{e.preventDefault();$("auth-message").textContent="Signing in…";try{await api("../api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("username").value,password:$("password").value})});$("password").value="";showDashboard();}catch(err){$("auth-message").textContent=err.message;}});
 $("logout").addEventListener("click",async()=>{try{await api("../api/auth/logout",{method:"POST"});}catch{}showLogin("You have been signed out.");});

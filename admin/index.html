@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Church Calendar Admin | Christ the King Church</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+.admin-wrap{max-width:480px;margin:8vh auto;padding:28px;background:#fff;border-radius:12px;box-shadow:0 8px 30px #0001}
+.admin-wrap h1{font-family:'Cinzel',serif;color:#382b20;font-size:1.6rem}
+.admin-wrap label{display:block;margin:16px 0 6px;font-weight:600}
+.admin-wrap input{width:100%;padding:12px;border:1px solid #bbb;border-radius:6px;font:inherit;box-sizing:border-box}
+.admin-wrap button{margin-top:20px;width:100%;padding:13px;border:0;border-radius:6px;background:#382b20;color:#fff;font:inherit;cursor:pointer}
+.admin-message{margin-top:14px;line-height:1.5}.admin-muted{color:#666;font-size:.9rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="admin-wrap">
+<p class="admin-muted">Christ the King Church · Secure administration</p>
+<h1>Calendar Administration</h1>
+<section id="setup-panel" hidden>
+<h2>Set up administrator account</h2>
+<p class="admin-muted">This one-time setup requires the setup token configured by the site owner. Choose a strong password with at least 14 characters.</p>
+<form id="setup-form">
+<label for="setup-token">One-time setup token</label><input id="setup-token" type="password" autocomplete="off" required>
+<label for="setup-password">New password</label><input id="setup-password" type="password" minlength="14" maxlength="256" autocomplete="new-password" required>
+<label for="setup-confirm">Confirm password</label><input id="setup-confirm" type="password" minlength="14" maxlength="256" autocomplete="new-password" required>
+<button type="submit">Create administrator account</button>
+</form>
+</section>
+<section id="login-panel" hidden>
+<h2>Administrator sign in</h2>
+<form id="login-form">
+<label for="username">Username</label><input id="username" value="admin" autocomplete="username" required>
+<label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
+<button type="submit">Sign in</button>
+</form>
+</section>
+<p id="message" class="admin-message" role="status" aria-live="polite"></p>
+<p><a href="../index.html">← Return to church website</a></p>
+</main>
+<script src="admin.js" defer></script>
+</body>
+</html>

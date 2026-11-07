@@ -1,46 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Church Calendar Admin | Christ the King Church</title>
+<title>Church Administration | Christ the King Church</title>
 <link rel="stylesheet" href="../style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-.admin-wrap{max-width:480px;margin:8vh auto;padding:28px;background:#fff;border-radius:12px;box-shadow:0 8px 30px #0001}
-.admin-wrap h1{font-family:'Cinzel',serif;color:#382b20;font-size:1.6rem}
-.admin-wrap label{display:block;margin:16px 0 6px;font-weight:600}
-.admin-wrap input{width:100%;padding:12px;border:1px solid #bbb;border-radius:6px;font:inherit;box-sizing:border-box}
-.admin-wrap button{margin-top:20px;width:100%;padding:13px;border:0;border-radius:6px;background:#382b20;color:#fff;font:inherit;cursor:pointer}
-.admin-message{margin-top:14px;line-height:1.5}.admin-muted{color:#666;font-size:.9rem}
+:root{--admin-ink:#35281e;--admin-gold:#9b7548;--admin-paper:#faf8f4}
+body{background:var(--admin-paper);font-family:'Open Sans',sans-serif;color:#302b26}
+.admin-shell{max-width:1240px;margin:32px auto;padding:0 18px 50px}
+.admin-head{display:flex;justify-content:space-between;align-items:center;gap:18px;background:#fff;padding:24px 28px;border-radius:16px;box-shadow:0 8px 28px #34281c0c}
+.admin-head h1{font-family:Cinzel,serif;color:var(--admin-ink);margin:4px 0;font-size:clamp(1.5rem,3vw,2.2rem)}
+.admin-kicker{color:#777;margin:0}
+.admin-actions{display:flex;gap:10px;flex-wrap:wrap}
+.admin-btn{border:0;border-radius:7px;padding:11px 16px;background:var(--admin-ink);color:#fff;font:600 14px 'Open Sans';cursor:pointer}
+.admin-btn.secondary{background:#eee8df;color:var(--admin-ink);border:1px solid #ddd2c5}
+.admin-btn.danger{background:#8b3434}
+.admin-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.admin-nav button{background:#fff;color:#554638;border:1px solid #e4ddd4;border-radius:30px;padding:10px 16px;cursor:pointer;font-weight:600}
+.admin-nav button.active{background:var(--admin-ink);color:#fff;border-color:var(--admin-ink)}
+.panel{background:#fff;border-radius:14px;padding:24px;margin-top:16px;box-shadow:0 8px 28px #34281c0a}
+.panel h2{font-family:Cinzel,serif;color:var(--admin-ink);margin-top:0}
+.panel[hidden],.view[hidden]{display:none!important}
+.toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:150px;flex:1}
+.field label{font-size:13px;font-weight:700;color:#5d5146}
+.field input,.field select,.field textarea{border:1px solid #d6cec4;border-radius:7px;padding:10px;font:14px 'Open Sans';width:100%;box-sizing:border-box;background:#fff}
+.field textarea{min-height:90px;resize:vertical}
+.admin-table-wrap{overflow:auto}
+.admin-table{width:100%;border-collapse:collapse;font-size:14px}
+.admin-table th,.admin-table td{text-align:left;padding:12px 10px;border-bottom:1px solid #eee8e1;vertical-align:top}
+.admin-table th{color:#76624e;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.admin-table tr:hover td{background:#fcfaf7}
+.tag{display:inline-block;border-radius:20px;padding:3px 8px;background:#f0ebe4;color:#5c4936;font-size:12px;white-space:nowrap}
+.status{margin:14px 0;padding:12px 14px;background:#f5f1eb;border-left:3px solid var(--admin-gold);border-radius:5px;line-height:1.5}
+.status:empty{display:none}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.small{font-size:12px;color:#777}
+.calendar-tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.day-name{font-weight:700;color:#35281e}
+.day-sub{font-size:12px;color:#777;margin-top:4px}
+.login-wrap{max-width:500px;margin:8vh auto;background:white;padding:30px;border-radius:16px;box-shadow:0 10px 36px #34281c12}
+.login-wrap h1{font-family:Cinzel,serif;color:var(--admin-ink)}
+.login-wrap label{display:block;margin:16px 0 6px;font-weight:600}
+.login-wrap input{width:100%;padding:12px;border:1px solid #bbb;border-radius:7px;font:inherit;box-sizing:border-box}
+.login-wrap button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:7px;background:var(--admin-ink);color:white;font:inherit;cursor:pointer}
 [hidden]{display:none!important}
+@media(max-width:700px){.admin-head{align-items:flex-start;flex-direction:column}.panel{padding:17px}.grid2{grid-template-columns:1fr}.admin-shell{margin-top:12px}}
 </style>
 </head>
 <body>
-<main class="admin-wrap">
-<p class="admin-muted">Christ the King Church · Secure administration</p>
-<h1>Calendar Administration</h1>
-<section id="setup-panel" hidden>
-<h2>Set up administrator account</h2>
-<p class="admin-muted">This one-time setup requires the setup token configured by the site owner. Choose a strong password with at least 14 characters.</p>
-<form id="setup-form">
-<label for="setup-token">One-time setup token</label><input id="setup-token" type="password" autocomplete="off" required>
-<label for="setup-password">New password</label><input id="setup-password" type="password" minlength="14" maxlength="256" autocomplete="new-password" required>
-<label for="setup-confirm">Confirm password</label><input id="setup-confirm" type="password" minlength="14" maxlength="256" autocomplete="new-password" required>
-<button type="submit">Create administrator account</button>
-</form>
+<main class="admin-shell">
+<section id="auth-view" class="login-wrap" hidden>
+<p class="admin-kicker">Christ the King Church · Secure administration</p><h1>Administrator sign in</h1>
+<form id="login-form"><label for="username">Username</label><input id="username" value="admin" autocomplete="username" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>
+<p id="auth-message" class="status" role="status"></p><a href="../index.html">← Return to church website</a>
 </section>
-<section id="login-panel" hidden>
-<h2>Administrator sign in</h2>
-<form id="login-form">
-<label for="username">Username</label><input id="username" value="admin" autocomplete="username" required>
-<label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
-<button type="submit">Sign in</button>
-</form>
+<section id="dashboard" hidden>
+<header class="admin-head"><div><p class="admin-kicker">Christ the King Church · Secure administration</p><h1>Calendar & Church Administration</h1><p class="small">Signed in as <strong>admin</strong> · SSPX Ordo 1962 · Universal calendar</p></div><div class="admin-actions"><button id="logout" class="admin-btn secondary">Sign out</button><a class="admin-btn" href="../index.html" style="text-decoration:none">View website</a></div></header>
+<nav class="admin-nav" aria-label="Administration sections">
+<button class="active" data-view="calendar">Liturgical calendar</button><button data-view="announcements">Announcements</button><button data-view="schedules">Mass schedules</button><button data-view="activity">Sync & activity</button>
+</nav>
+<p id="global-message" class="status" role="status" aria-live="polite"></p>
+<section id="view-calendar" class="view panel">
+<h2>Liturgical Calendar</h2><p class="small">Universal 1962 calendar with the Society of Saint Pius X observances. English and Latin are stored side by side.</p>
+<div class="calendar-tools">
+<div class="field"><label for="cal-year">Year</label><input id="cal-year" type="number" min="1900" max="2200"></div>
+<div class="field"><label for="cal-month">Month</label><select id="cal-month"></select></div>
+<button id="load-calendar" class="admin-btn secondary">Load month</button><button id="sync-calendar" class="admin-btn">Sync year from Ordo</button>
+</div>
+<p id="calendar-meta" class="small"></p>
+<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>English</th><th>Latin</th><th>Class / Colour</th><th>Observances</th><th></th></tr></thead><tbody id="calendar-rows"><tr><td colspan="6">Loading…</td></tr></tbody></table></div>
+<div id="override-editor" class="panel" hidden><h3>Edit local display override</h3><p class="small">The original Ordo data is preserved. Overrides affect the church website's displayed feast name only.</p><form id="override-form"><input id="override-date" type="hidden"><div class="grid2"><div class="field"><label for="override-language">Language</label><select id="override-language"><option value="en">English</option><option value="la">Latin</option><option value="both">Both</option></select></div><div class="field"><label for="override-field">Field</label><input id="override-field" value="celebration.name" readonly></div></div><div class="field"><label for="override-value">Display name</label><input id="override-value" required></div><div class="field"><label for="override-reason">Reason (optional)</label><input id="override-reason"></div><div class="form-actions"><button class="admin-btn" type="submit">Save override</button><button class="admin-btn secondary" type="button" id="cancel-override">Cancel</button></div></form></div>
 </section>
-<p id="message" class="admin-message" role="status" aria-live="polite"></p>
-<p><a href="../index.html">← Return to church website</a></p>
+<section id="view-announcements" class="view panel" hidden><h2>Church Announcements</h2>
+<form id="announcement-form"><input type="hidden" id="ann-id"><div class="grid2"><div class="field"><label for="ann-title-en">Title (English) *</label><input id="ann-title-en" required></div><div class="field"><label for="ann-title-la">Title (Latin)</label><input id="ann-title-la"></div></div><div class="grid2"><div class="field"><label for="ann-body-en">Message (English)</label><textarea id="ann-body-en"></textarea></div><div class="field"><label for="ann-body-la">Message (Latin)</label><textarea id="ann-body-la"></textarea></div></div><div class="grid2"><div class="field"><label for="ann-start">Start date</label><input id="ann-start" type="date"></div><div class="field"><label for="ann-end">End date</label><input id="ann-end" type="date"></div></div><label><input id="ann-published" type="checkbox"> Published on website</label><div class="form-actions"><button class="admin-btn" type="submit">Save announcement</button><button class="admin-btn secondary" type="button" id="ann-reset">Clear form</button></div></form>
+<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Title</th><th>Dates</th><th>Status</th><th>Actions</th></tr></thead><tbody id="announcement-rows"></tbody></table></div></section>
+<section id="view-schedules" class="view panel" hidden><h2>Mass & Devotion Schedules</h2>
+<form id="schedule-form"><input type="hidden" id="sch-id"><div class="grid2"><div class="field"><label for="sch-title-en">Title (English) *</label><input id="sch-title-en" required></div><div class="field"><label for="sch-title-la">Title (Latin)</label><input id="sch-title-la"></div></div><div class="grid2"><div class="field"><label for="sch-details-en">Details (English)</label><textarea id="sch-details-en"></textarea></div><div class="field"><label for="sch-details-la">Details (Latin)</label><textarea id="sch-details-la"></textarea></div></div><div class="grid2"><div class="field"><label for="sch-weekday">Weekday (0 Sun – 6 Sat; blank = any)</label><select id="sch-weekday"><option value="">Any / use date</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div><div class="field"><label for="sch-date">Specific date (optional)</label><input id="sch-date" type="date"></div></div><div class="grid2"><div class="field"><label for="sch-time">Start time</label><input id="sch-time" type="time"></div><div class="field"><label for="sch-order">Display order</label><input id="sch-order" type="number" value="0"></div></div><label><input id="sch-active" type="checkbox" checked> Active</label><div class="form-actions"><button class="admin-btn" type="submit">Save schedule</button><button class="admin-btn secondary" type="button" id="sch-reset">Clear form</button></div></form>
+<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Schedule</th><th>When</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead><tbody id="schedule-rows"></tbody></table></div></section>
+<section id="view-activity" class="view panel" hidden><h2>Synchronization & Audit History</h2><p class="small">The calendar can be synchronised manually here. Daily automatic synchronisation will be enabled after the scheduled worker is installed.</p><h3>Recent syncs</h3><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Started</th><th>Finished</th><th>Status</th><th>Records</th><th>Details</th></tr></thead><tbody id="sync-rows"></tbody></table></div><h3>Administrator activity</h3><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Record</th></tr></thead><tbody id="audit-rows"></tbody></table></div></section>
+</section>
 </main>
 <script src="admin.js" defer></script>
-</body>
-</html>
+</body></html>

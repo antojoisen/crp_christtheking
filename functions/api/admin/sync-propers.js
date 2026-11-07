@@ -5,9 +5,17 @@ function dateParts(date){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(date||"");retu
 async function fetchTexts(date,lang){
   const p=dateParts(date);if(!p)throw new Error("Invalid date "+date);
   const url=ORDO+"/"+p.year+"/"+p.month+"/"+p.day+"/texts?lang="+lang+"&congregation=fsspx";
-  const response=await fetch(url,{headers:{"Accept":"application/json","User-Agent":"ChristTheKingChurchCalendar/1.0"}});
-  if(!response.ok)throw new Error("Ordo texts returned HTTP "+response.status+" for "+date+" ("+lang+")");
-  return await response.json();
+  let lastError;
+  for(let attempt=1;attempt<=3;attempt++){
+    try{
+      const response=await fetch(url,{headers:{"Accept":"application/json","User-Agent":"ChristTheKingChurchCalendar/1.0"}});
+      if(response.ok)return await response.json();
+      lastError=new Error("Ordo texts returned HTTP "+response.status+" for "+date+" ("+lang+")");
+      if(response.status<500&&response.status!==429)break;
+    }catch(error){lastError=error;}
+    if(attempt<3)await new Promise(resolve=>setTimeout(resolve,350*attempt));
+  }
+  throw lastError||new Error("Ordo texts request failed for "+date+" ("+lang+")");
 }
 export async function onRequestPost({request,env}){
   if(!sameOrigin(request))return json({error:"Request origin rejected."},403);

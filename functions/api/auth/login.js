@@ -39,7 +39,10 @@ export async function onRequestPost({ request, env }) {
     "INSERT INTO audit_logs (actor, action, entity_type, entity_id, created_at) VALUES ('admin', 'login', 'admin_session', ?, ?)"
   ).bind(await sha256(sessionToken), now.toISOString()).run();
 
-  return json({ success: true, username: "admin", csrfToken }, 200, {
-    "Set-Cookie": [sessionCookie(sessionToken), csrfCookie(csrfToken)]
-  });
+  const headers = new Headers();
+  headers.append("Set-Cookie", sessionCookie(sessionToken));
+  headers.append("Set-Cookie", csrfCookie(csrfToken));
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  headers.set("Cache-Control", "no-store");
+  return new Response(JSON.stringify({ success: true, username: "admin", csrfToken }), { status: 200, headers });
 }

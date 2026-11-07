@@ -1,41 +1,46 @@
 const $ = id => document.getElementById(id);
-const message = text => { $("message").textContent = text; };
-async function api(path, options = {}) {
-  const response = await fetch(path, { credentials: "same-origin", cache: "no-store", ...options });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "Request failed.");
+const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const strip = value => String(value ?? "").replace(/<[^>]*>/g,"").replace(/&nbsp;/g," ").trim();
+const message = text => { $("global-message").textContent = text || ""; };
+function csrf(){const m=document.cookie.match(/(?:^|;\s*)ctk_csrf=([^;]+)/);return m?decodeURIComponent(m[1]):"";}
+async function api(path, options={}) {
+  const headers=new Headers(options.headers||{});
+  if(options.method && options.method!=="GET") headers.set("X-CSRF-Token",csrf());
+  const response=await fetch(path,{credentials:"same-origin",cache:"no-store",...options,headers});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok) throw new Error(data.error||("Request failed ("+response.status+")."));
   return data;
 }
-async function initialize() {
-  try {
-    const session = await api("../api/auth/me");
-    if (session.authenticated) {
-      message("You are signed in as admin. The calendar management dashboard is the next module to be enabled.");
-      return;
-    }
-  } catch {}
-  // Setup state is deliberately not disclosed by a public status endpoint.
-  $("login-panel").hidden = false;
-  $("setup-panel").hidden = false;
-  message("If this is the first visit, complete the one-time setup. Otherwise, sign in.");
+function showDashboard(){ $("auth-view").hidden=true; $("dashboard").hidden=false; loadCalendar(); loadAnnouncements(); loadSchedules(); loadActivity(); }
+function showLogin(msg="Please sign in to continue."){$("dashboard").hidden=true;$("auth-view").hidden=false;$("auth-message").textContent=msg;}
+function activateView(name){document.querySelectorAll(".admin-nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===name));document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!=="view-"+name);if(name==="announcements")loadAnnouncements();if(name==="schedules")loadSchedules();if(name==="activity")loadActivity();}
+document.querySelectorAll(".admin-nav button").forEach(b=>b.addEventListener("click",()=>activateView(b.dataset.view)));
+async function initialize(){try{const s=await api("../api/auth/me");if(s.authenticated){showDashboard();return;}}catch{}showLogin();}
+$("login-form").addEventListener("submit",async e=>{e.preventDefault();$("auth-message").textContent="Signing in…";try{await api("../api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("username").value,password:$("password").value})});$("password").value="";showDashboard();}catch(err){$("auth-message").textContent=err.message;}});
+$("logout").addEventListener("click",async()=>{try{await api("../api/auth/logout",{method:"POST"});}catch{}showLogin("You have been signed out.");});
+function setupCalendarControls(){const select=$("cal-month");months.forEach((m,i)=>{const o=document.createElement("option");o.value=String(i+1);o.textContent=m;select.append(o);});const now=new Date();$("cal-year").value=now.getFullYear();select.value=String(now.getMonth()+1);}
+function dayName(day){return ["","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][Number(day)]||"";}
+function displayName(entry,lang){const override=(entry.overrides||[]).find(o=>o.field_key==="celebration.name"&&(o.language===lang||o.language==="both"));const day=entry.data?.[lang]?.day;return override?.value||day?.celebration?.name||day?.name||"—";}
+function renderCalendar(data){const rows=$("calendar-rows");if(!data.days?.length){rows.innerHTML='<tr><td colspan="6">No cached dates for this month yet. Use “Sync year from Ordo”.</td></tr>';return;}
+rows.innerHTML=data.days.map(entry=>{const en=entry.data?.en?.day||{},la=entry.data?.la?.day||{};const c=en.celebration||la.celebration||{};const obs=en.observances||{};const flags=[];if(obs.abstinence||obs.fsspx?.abstinence)flags.push("Abstinence");if(obs.fast||obs.fsspx?.fast)flags.push("Fast");if(obs.ofPrecept)flags.push("Holy day of obligation");const date=new Date(entry.date+"T00:00:00");const dateLabel=date.toLocaleDateString("en-IN",{day:"2-digit",month:"short",weekday:"short"});return '<tr><td><strong>'+esc(dateLabel)+'</strong><div class="day-sub">'+esc(entry.date)+'</div></td><td><span class="day-name">'+esc(strip(displayName(entry,"en"))||"—")+'</span>'+(en.commemorations?.length?'<div class="day-sub">+ '+esc(en.commemorations.map(x=>strip(x.name)).join("; "))+'</div>':"")+'</td><td>'+esc(strip(displayName(entry,"la"))||"—")+'</td><td><span class="tag">'+esc(c.rank?("Class "+c.rank):"—")+'</span><div class="day-sub">'+esc(c.color||"")+'</div></td><td class="small">'+esc(flags.join(" · ")||"—")+'</td><td><button class="admin-btn secondary edit-day" data-date="'+esc(entry.date)+'" data-en="'+esc(strip(displayName(entry,"en")))+'" data-la="'+esc(strip(displayName(entry,"la")))+'">Edit</button></td></tr>';}).join("");
+document.querySelectorAll(".edit-day").forEach(b=>b.addEventListener("click",()=>{ $("override-date").value=b.dataset.date;$("override-language").value="en";$("override-value").value=b.dataset.en||"";$("override-reason").value="";$("override-editor").hidden=false;$("override-editor").scrollIntoView({behavior:"smooth",block:"center"});}));
+$("calendar-meta").textContent=data.count+" days cached for this month. Latest sync: "+(data.days[0]?.syncedAt||"unknown");
 }
-$("setup-form").addEventListener("submit", async event => {
-  event.preventDefault();
-  const token = $("setup-token").value;
-  const password = $("setup-password").value;
-  if (password !== $("setup-confirm").value) return message("The passwords do not match.");
-  try {
-    const result = await api("../api/auth/setup", { method: "POST", headers: { "Content-Type": "application/json", "X-Setup-Token": token }, body: JSON.stringify({ password }) });
-    message(result.message || "Account created. Please sign in.");
-    $("setup-form").reset();
-  } catch (error) { message(error.message); }
-});
-$("login-form").addEventListener("submit", async event => {
-  event.preventDefault();
-  try {
-    await api("../api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: $("username").value, password: $("password").value }) });
-    $("password").value = "";
-    message("Signed in successfully. Calendar management features will appear here when enabled.");
-  } catch (error) { message(error.message); }
-});
+async function loadCalendar(){const year=$("cal-year").value,month=$("cal-month").value;$("calendar-rows").innerHTML='<tr><td colspan="6">Loading calendar…</td></tr>';try{const d=await api("../api/admin/data?kind=calendar&year="+encodeURIComponent(year)+"&month="+encodeURIComponent(month));renderCalendar(d);}catch(e){$("calendar-rows").innerHTML='<tr><td colspan="6">'+esc(e.message)+'</td></tr>';}}
+$("load-calendar").addEventListener("click",loadCalendar);
+$("sync-calendar").addEventListener("click",async()=>{const year=Number($("cal-year").value);if(!confirm("Download and save the English and Latin Ordo calendar for "+year+"?"))return;message("Synchronising with Ordo. This may take a little time…");$("sync-calendar").disabled=true;try{const r=await api("../api/admin/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({year})});message("Sync complete: "+r.records+" days saved for "+r.year+" in English and Latin.");await loadCalendar();await loadActivity();}catch(e){message(e.message);}finally{$("sync-calendar").disabled=false;}});
+$("override-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("../api/admin/data",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind:"override",date:$("override-date").value,field_key:"celebration.name",language:$("override-language").value,value:$("override-value").value,reason:$("override-reason").value})});message("Local calendar override saved.");$("override-editor").hidden=true;await loadCalendar();}catch(err){message(err.message);}});
+$("cancel-override").addEventListener("click",()=>$("override-editor").hidden=true);
+async function loadAnnouncements(){try{const d=await api("../api/admin/data?kind=announcements");$("announcement-rows").innerHTML=(d.items||[]).map(x=>'<tr><td><strong>'+esc(x.title_en)+'</strong><div class="day-sub">'+esc(x.title_la||"")+'</div></td><td>'+esc(x.starts_on||"—")+' – '+esc(x.ends_on||"—")+'</td><td><span class="tag">'+(x.published?"Published":"Draft")+'</span></td><td><button class="admin-btn secondary ann-edit" data-id="'+x.id+'">Edit</button> <button class="admin-btn danger ann-delete" data-id="'+x.id+'">Delete</button></td></tr>').join("")||'<tr><td colspan="4">No announcements yet.</td></tr>';document.querySelectorAll(".ann-edit").forEach(b=>b.onclick=()=>editAnnouncement(d.items.find(x=>x.id===Number(b.dataset.id))));document.querySelectorAll(".ann-delete").forEach(b=>b.onclick=()=>deleteItem("announcement",b.dataset.id));}catch(e){message(e.message);}}
+function editAnnouncement(x){$("ann-id").value=x.id;$("ann-title-en").value=x.title_en||"";$("ann-title-la").value=x.title_la||"";$("ann-body-en").value=x.body_en||"";$("ann-body-la").value=x.body_la||"";$("ann-start").value=x.starts_on||"";$("ann-end").value=x.ends_on||"";$("ann-published").checked=!!x.published;}
+$("announcement-form").addEventListener("submit",async e=>{e.preventDefault();const b={kind:"announcement",id:$("ann-id").value||null,title_en:$("ann-title-en").value,title_la:$("ann-title-la").value,body_en:$("ann-body-en").value,body_la:$("ann-body-la").value,starts_on:$("ann-start").value||null,ends_on:$("ann-end").value||null,published:$("ann-published").checked};try{await api("../api/admin/data",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});$("announcement-form").reset();$("ann-id").value="";message("Announcement saved.");loadAnnouncements();}catch(err){message(err.message);}});
+$("ann-reset").onclick=()=>$("announcement-form").reset();
+async function loadSchedules(){try{const d=await api("../api/admin/data?kind=schedules");$("schedule-rows").innerHTML=(d.items||[]).map(x=>'<tr><td><strong>'+esc(x.title_en)+'</strong><div class="day-sub">'+esc(x.details_en||"")+'</div></td><td>'+esc(x.specific_date|| (x.weekday===null?"Any day":dayName(x.weekday)))+'</td><td>'+esc(x.start_time||"—")+'</td><td><span class="tag">'+(x.active?"Active":"Inactive")+'</span></td><td><button class="admin-btn secondary sch-edit" data-id="'+x.id+'">Edit</button> <button class="admin-btn danger sch-delete" data-id="'+x.id+'">Delete</button></td></tr>').join("")||'<tr><td colspan="5">No schedules saved yet.</td></tr>';document.querySelectorAll(".sch-edit").forEach(b=>b.onclick=()=>editSchedule(d.items.find(x=>x.id===Number(b.dataset.id))));document.querySelectorAll(".sch-delete").forEach(b=>b.onclick=()=>deleteItem("schedule",b.dataset.id));}catch(e){message(e.message);}}
+function editSchedule(x){$("sch-id").value=x.id;$("sch-title-en").value=x.title_en||"";$("sch-title-la").value=x.title_la||"";$("sch-details-en").value=x.details_en||"";$("sch-details-la").value=x.details_la||"";$("sch-weekday").value=x.weekday??"";$("sch-date").value=x.specific_date||"";$("sch-time").value=x.start_time||"";$("sch-order").value=x.sort_order||0;$("sch-active").checked=!!x.active;}
+$("schedule-form").addEventListener("submit",async e=>{e.preventDefault();const b={kind:"schedule",id:$("sch-id").value||null,title_en:$("sch-title-en").value,title_la:$("sch-title-la").value,details_en:$("sch-details-en").value,details_la:$("sch-details-la").value,weekday:$("sch-weekday").value,specific_date:$("sch-date").value||null,start_time:$("sch-time").value||null,sort_order:$("sch-order").value,active:$("sch-active").checked};try{await api("../api/admin/data",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});$("schedule-form").reset();$("sch-id").value="";$("sch-active").checked=true;message("Schedule saved.");loadSchedules();}catch(err){message(err.message);}});
+$("sch-reset").onclick=()=>{$("schedule-form").reset();$("sch-id").value="";$("sch-active").checked=true;};
+async function deleteItem(kind,id){if(!confirm("Delete this "+kind+"?"))return;try{await api("../api/admin/data?kind="+kind+"&id="+id,{method:"DELETE"});message("Item deleted.");kind==="announcement"?loadAnnouncements():loadSchedules();}catch(e){message(e.message);}}
+async function loadActivity(){try{const [sync,audit]=await Promise.all([api("../api/admin/data?kind=sync"),api("../api/admin/data?kind=audit")]);$("sync-rows").innerHTML=(sync.items||[]).map(x=>'<tr><td>'+esc(x.started_at)+'</td><td>'+esc(x.finished_at||"—")+'</td><td><span class="tag">'+esc(x.status)+'</span></td><td>'+esc(x.records_fetched)+'</td><td class="small">'+esc(x.error_message||"—")+'</td></tr>').join("")||'<tr><td colspan="5">No sync history yet.</td></tr>';$("audit-rows").innerHTML=(audit.items||[]).map(x=>'<tr><td>'+esc(x.created_at)+'</td><td>'+esc(x.actor)+'</td><td>'+esc(x.action)+'</td><td>'+esc(x.entity_type+" "+(x.entity_id||""))+'</td></tr>').join("")||'<tr><td colspan="4">No activity recorded yet.</td></tr>';}catch(e){message(e.message);}}
+setupCalendarControls();
 initialize();

@@ -21,7 +21,15 @@ export async function onRequestGet({ request, env }) {
       const endDate = new Date(Date.UTC(year, month, 1));
       const end = endDate.toISOString().slice(0,10);
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT liturgical_date, raw_ordo_json, synced_at FROM liturgical_days WHERE liturgical_date >= ? AND liturgical_date < ? ORDER BY liturgical_date").bind(start,end).all();
-      return json({ days: (result.results || []).map(row => ({ date: row.liturgical_date, data: JSON.parse(row.raw_ordo_json), syncedAt: row.synced_at })), count: result.results?.length || 0 });
+      const dates=(result.results || []).map(row => row.liturgical_date);
+      let overrides=[];
+      if(dates.length) {
+        const ov=await env.CHRISTTHEKING_DB.prepare("SELECT liturgical_date,field_key,language,value,reason,updated_at FROM admin_overrides WHERE liturgical_date >= ? AND liturgical_date < ?").bind(start,end).all();
+        overrides=ov.results||[];
+      }
+      const grouped={};
+      for(const item of overrides) (grouped[item.liturgical_date] ||= []).push(item);
+      return json({ days: (result.results || []).map(row => ({ date: row.liturgical_date, data: JSON.parse(row.raw_ordo_json), overrides: grouped[row.liturgical_date]||[], syncedAt: row.synced_at })), count: result.results?.length || 0 });
     }
     if (kind === "announcements") {
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM announcements ORDER BY starts_on DESC, id DESC").all();
@@ -31,7 +39,7 @@ export async function onRequestGet({ request, env }) {
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM mass_schedules ORDER BY sort_order, weekday, specific_date, id").all();
       return json({items:result.results || []});
     }
-    if (kind === "overrides") {
+    if (kind === "audit") {\n      const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,actor,action,entity_type,entity_id,created_at FROM audit_logs ORDER BY id DESC LIMIT 100").all();\n      return json({items:result.results||[]});\n    }\n    if (kind === "sync") {\n      const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,started_at,finished_at,status,records_fetched,error_message FROM sync_logs ORDER BY id DESC LIMIT 30").all();\n      return json({items:result.results||[]});\n    }\n    if (kind === "overrides") {
       const date = url.searchParams.get("date");
       if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date || "")) return json({error:"A valid date is required."},400);
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM admin_overrides WHERE liturgical_date=? ORDER BY field_key, language").bind(date).all();

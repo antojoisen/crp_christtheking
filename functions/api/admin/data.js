@@ -39,7 +39,15 @@ export async function onRequestGet({ request, env }) {
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM mass_schedules ORDER BY sort_order, weekday, specific_date, id").all();
       return json({items:result.results || []});
     }
-    if (kind === "audit") {\n      const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,actor,action,entity_type,entity_id,created_at FROM audit_logs ORDER BY id DESC LIMIT 100").all();\n      return json({items:result.results||[]});\n    }\n    if (kind === "sync") {\n      const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,started_at,finished_at,status,records_fetched,error_message FROM sync_logs ORDER BY id DESC LIMIT 30").all();\n      return json({items:result.results||[]});\n    }\n    if (kind === "overrides") {
+    if (kind === "audit") {
+      const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,actor,action,entity_type,entity_id,created_at FROM audit_logs ORDER BY id DESC LIMIT 100").all();
+      return json({items:result.results||[]});
+    }
+    if (kind === "sync") {
+      const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,started_at,finished_at,status,records_fetched,error_message FROM sync_logs ORDER BY id DESC LIMIT 30").all();
+      return json({items:result.results||[]});
+    }
+    if (kind === "overrides") {
       const date = url.searchParams.get("date");
       if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date || "")) return json({error:"A valid date is required."},400);
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM admin_overrides WHERE liturgical_date=? ORDER BY field_key, language").bind(date).all();

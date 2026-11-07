@@ -2,7 +2,8 @@
   "version": 1,
   "include": [
     "/api/auth/*",
-    "/api/admin/*"
+    "/api/admin/*",
+    "/api/public"
   ],
   "exclude": []
 }

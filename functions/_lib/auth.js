@@ -1,6 +1,7 @@
 const encoder = new TextEncoder();
 const SESSION_SECONDS = 60 * 60 * 12;
-const PBKDF2_ITERATIONS = 310000;
+// Cloudflare Workers currently caps PBKDF2 at 100,000 iterations.
+const PBKDF2_ITERATIONS = 100000;
 
 export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {

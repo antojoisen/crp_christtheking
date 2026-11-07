@@ -14,7 +14,7 @@ export async function onRequestGet({request,env}) {
     }
     if(kind==="propers") {
       const date=url.searchParams.get("date");
-      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date||""))return json({error:"A valid date is required."},400);
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date||""))return json({error:"A valid date is required."},400);
       const result=await env.CHRISTTHEKING_DB.prepare("SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language").bind(date).all();
       const items={};
       for(const row of (result.results||[]))items[row.language]={data:JSON.parse(row.raw_texts_json),syncedAt:row.synced_at,missing:JSON.parse(row.missing_json||"[]")};

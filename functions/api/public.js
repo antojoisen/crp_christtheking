@@ -1,4 +1,4 @@
-import { json } from "../../_lib/auth.js";
+import { json } from "../_lib/auth.js";
 
 export async function onRequestGet({request,env}) {
   const url=new URL(request.url);

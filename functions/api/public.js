@@ -12,6 +12,17 @@ export async function onRequestGet({request,env}) {
       ]);
       return json({announcements:ann.results||[],schedules:schedules.results||[]});
     }
+    if(kind==="feast") {
+      const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+      const [calendar,propers]=await Promise.all([
+        env.CHRISTTHEKING_DB.prepare("SELECT raw_ordo_json,synced_at FROM liturgical_days WHERE liturgical_date=?").bind(today).first(),
+        env.CHRISTTHEKING_DB.prepare("SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language").bind(today).all()
+      ]);
+      const dayData=calendar?JSON.parse(calendar.raw_ordo_json):null;
+      const items={};
+      for(const row of (propers.results||[]))items[row.language]={data:JSON.parse(row.raw_texts_json),syncedAt:row.synced_at,missing:JSON.parse(row.missing_json||"[]")};
+      return json({date:today,calendar:dayData,propers:items,available:Object.keys(items)});
+    }
     if(kind==="propers") {
       const date=url.searchParams.get("date");
       if(!/^\d{4}-\d{2}-\d{2}$/.test(date||""))return json({error:"A valid date is required."},400);

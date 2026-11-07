@@ -17,7 +17,7 @@
    }
   }
   if(feast.ok){
-   const data=await feast.json(),en=data.calendar?.en?.day,la=data.calendar?.la?.day;
+   const data=await feast.json(),en=data.calendar?.en?.day||data.calendar?.en,la=data.calendar?.la?.day||data.calendar?.la;
    const name=en?.celebration?.name||la?.celebration?.name||"Liturgical celebration";
    const clean=s=>String(s||"").replace(/<[^>]*>/g,"").replace(/&nbsp;/g," ").trim();
    const date=new Date(data.date+"T12:00:00");

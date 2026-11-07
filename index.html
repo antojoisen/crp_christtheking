@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <script defer src="script.js"></script>
     <script defer src="saints.js"></script>
+    <script defer src="public-content.js"></script>
 </head>
 <body>
     <header id="navbar">
@@ -25,6 +26,7 @@
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">About</a></li>
+                    <li><a href="calendar/index.html">Liturgical Calendar</a></li>
                     <li><a href="#schedule">Schedule</a></li>
                     <li><a href="#location">Location</a></li>
                 </ul>
@@ -119,6 +121,10 @@
                     <p class="saint-desc" id="saint-desc">Please wait while we load the liturgical calendar.</p>
                     <a href="saint-details.html" id="saint-link" class="read-more">Read More &rarr;</a>
                 </div>
+            </div>
+
+            <div class="sidebar-widget mt-30" id="public-announcements" style="display:none;">
+                <h3 class="widget-title">Church Announcements</h3><div class="widget-content" id="public-announcement-list"></div>
             </div>
 
             <div class="sidebar-widget mt-30">

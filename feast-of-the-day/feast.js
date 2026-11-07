@@ -34,7 +34,7 @@ function renderLanguage(lang,item){
  for(const [key,label] of Object.entries(labels)){const raw=missa[key];if(raw)html+='<article class="proper-item"><h3>'+esc(label)+'</h3>'+safeOrdoHtml(raw)+'</article>';}
  for(const [key,raw] of Object.entries(missa)){if(!labels[key]&&typeof raw==="string"&&raw.trim())html+='<article class="proper-item"><h3>'+esc(key)+'</h3>'+safeOrdoHtml(raw)+'</article>';}
  box.innerHTML=html||'<p>Mass texts are not available in the cached record for this language.</p>';
- if(item.missing?.length){const missing=item.missing.map(x=>typeof x==="string"?x.replace(/^missa\\//,"").replaceAll("/"," · "):String(x));box.insertAdjacentHTML("beforeend",'<p class="proper-note">Unavailable in this language: '+esc(missing.join(", "))+'</p>');}
+ if(item.missing?.length){const missing=item.missing.map(x=>typeof x==="string"?x.startsWith("missa/")?x.slice(6).replaceAll("/"," · "):x:String(x));box.insertAdjacentHTML("beforeend",'<p class="proper-note">Unavailable in this language: '+esc(missing.join(", "))+'</p>');}
 }
 async function load(){
  $("feast-status").textContent="Loading today’s liturgical celebration and Mass Propers…";

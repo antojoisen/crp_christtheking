@@ -49,7 +49,7 @@ export async function onRequestGet({ request, env }) {
     }
     if (kind === "overrides") {
       const date = url.searchParams.get("date");
-      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date || "")) return json({error:"A valid date is required."},400);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return json({error:"A valid date is required."},400);
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM admin_overrides WHERE liturgical_date=? ORDER BY field_key, language").bind(date).all();
       return json({items:result.results || []});
     }
@@ -88,7 +88,7 @@ export async function onRequestPost({ request, env }) {
       return json({success:true,id:body.id||result.meta?.last_row_id});
     }
     if (body.kind === "override") {
-      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(body.date||"") || !String(body.field_key||"").trim() || !String(body.value||"").trim()) return json({error:"Date, field and value are required."},400);
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(body.date||"") || !String(body.field_key||"").trim() || !String(body.value||"").trim()) return json({error:"Date, field and value are required."},400);
       const lang=["en","la","both"].includes(body.language)?body.language:"both";
       await env.CHRISTTHEKING_DB.prepare("INSERT INTO admin_overrides (liturgical_date,field_key,language,value,reason,updated_at) VALUES (?,?,?,?,?,?) ON CONFLICT(liturgical_date,field_key,language) DO UPDATE SET value=excluded.value,reason=excluded.reason,updated_at=excluded.updated_at").bind(body.date,String(body.field_key),lang,String(body.value),String(body.reason||""),now).run();
       await env.CHRISTTHEKING_DB.prepare("INSERT INTO audit_logs (actor,action,entity_type,entity_id,after_json,created_at) VALUES (?,'override','liturgical_day',?,?,?)").bind(session.username,body.date,JSON.stringify(body),now).run();

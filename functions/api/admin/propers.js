@@ -4,7 +4,7 @@ export async function onRequestGet({request,env}) {
   const session=await getSession(request,env);
   if(!session)return json({error:"Please sign in to view cached Mass Propers."},401);
   const date=new URL(request.url).searchParams.get("date")||"";
-  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date))return json({error:"Choose a valid date."},400);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return json({error:"Choose a valid date."},400);
   try {
     const result=await env.CHRISTTHEKING_DB.prepare(
       "SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language"

@@ -8,7 +8,7 @@
     
     --font-heading: 'Cinzel', serif;
     --font-subheading: 'Playfair Display', serif;
-    --font-body: 'Open Sans', sans-serif;
+    --font-body: 'Source Sans 3', sans-serif;
 }
 
 * {
@@ -25,6 +25,8 @@ body {
     font-family: var(--font-body);
     color: var(--text-main);
     background-color: var(--light-bg);
+    background-image: radial-gradient(ellipse at 12% 8%, rgba(218,165,32,0.10), transparent 34%), radial-gradient(ellipse at 88% 28%, rgba(139,0,0,0.055), transparent 38%), linear-gradient(135deg, #fbf8f1 0%, #f3eee4 52%, #faf7f0 100%);
+    background-attachment: fixed;
     line-height: 1.6;
 }
 
@@ -466,4 +468,35 @@ footer {
     .nav-content { flex-direction: column; gap: 15px; }
     .hero-content h1 { font-size: 2.5rem; }
     .footer-content { grid-template-columns: 1fr; text-align: center; }
+}
+
+
+/* Refined typography and parchment atmosphere */
+body {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.005em;
+    line-height: 1.75;
+    background-image:
+      radial-gradient(ellipse at 10% 12%, rgba(218,165,32,.10), transparent 32%),
+      radial-gradient(ellipse at 92% 38%, rgba(139,0,0,.055), transparent 36%),
+      repeating-linear-gradient(0deg, rgba(111,84,49,.012) 0, rgba(111,84,49,.012) 1px, transparent 1px, transparent 5px),
+      linear-gradient(135deg,#fbf8f1 0%,#f1ebdf 52%,#faf7f0 100%);
+    background-attachment: fixed;
+}
+p, li, .widget-content, .schedule-card, .footer-info {
+    font-family: 'Source Sans 3', sans-serif;
+}
+.content-col p { font-size: 1.12rem; line-height: 1.85; color:#403c36; }
+.sidebar-widget, .schedule-card {
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(54,39,22,.07);
+}
+.sidebar-widget { border-color: rgba(140,112,75,.22); border-top: 4px solid var(--primary-color); }
+.widget-content { font-size:1.08rem; line-height:1.75; }
+.schedule-card { border:1px solid rgba(140,112,75,.14); border-left:4px solid var(--secondary-color); }
+footer { font-family:'Source Sans 3',sans-serif; }
+@media(max-width:768px) {
+ body { font-size:16px; background-attachment:scroll; }
+ .content-col p { font-size:1.05rem; }
 }

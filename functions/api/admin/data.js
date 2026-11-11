@@ -39,6 +39,10 @@ export async function onRequestGet({ request, env }) {
       const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM mass_schedules ORDER BY sort_order, weekday, specific_date, id").all();
       return json({items:result.results || []});
     }
+    if (kind === "special_occasions") {
+      const result = await env.CHRISTTHEKING_DB.prepare("SELECT * FROM special_occasions ORDER BY sort_order, starts_on, id").all();
+      return json({items:result.results || []});
+    }
     if (kind === "audit") {
       const result=await env.CHRISTTHEKING_DB.prepare("SELECT id,actor,action,entity_type,entity_id,created_at FROM audit_logs ORDER BY id DESC LIMIT 100").all();
       return json({items:result.results||[]});
@@ -87,6 +91,17 @@ export async function onRequestPost({ request, env }) {
       await env.CHRISTTHEKING_DB.prepare("INSERT INTO audit_logs (actor,action,entity_type,entity_id,after_json,created_at) VALUES (?,'save','mass_schedule',?,?,?)").bind(session.username,String(body.id||result.meta?.last_row_id||""),JSON.stringify(body),now).run();
       return json({success:true,id:body.id||result.meta?.last_row_id});
     }
+    if (body.kind === "special_occasion") {
+      const title=String(body.title_en||"").trim();
+      if(!title)return json({error:"English title is required."},400);
+      const values=[title,String(body.title_la||""),String(body.details_en||""),String(body.details_la||""),body.starts_on||null,body.ends_on||null,body.active===false?0:1,Number(body.sort_order)||0,now];
+      let result;
+      if(body.id)result=await env.CHRISTTHEKING_DB.prepare("UPDATE special_occasions SET title_en=?,title_la=?,details_en=?,details_la=?,starts_on=?,ends_on=?,active=?,sort_order=?,updated_at=? WHERE id=?").bind(...values,Number(body.id)).run();
+      else result=await env.CHRISTTHEKING_DB.prepare("INSERT INTO special_occasions (title_en,title_la,details_en,details_la,starts_on,ends_on,active,sort_order,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)").bind(...values.slice(0,8),now,now).run();
+      const id=body.id||result.meta?.last_row_id||"";
+      await env.CHRISTTHEKING_DB.prepare("INSERT INTO audit_logs (actor,action,entity_type,entity_id,after_json,created_at) VALUES (?,'save','special_occasion',?,?,?)").bind(session.username,String(id),JSON.stringify(body),now).run();
+      return json({success:true,id});
+    }
     if (body.kind === "override") {
       if(!/^\d{4}-\d{2}-\d{2}$/.test(body.date||"") || !String(body.field_key||"").trim() || !String(body.value||"").trim()) return json({error:"Date, field and value are required."},400);
       const lang=["en","la","both"].includes(body.language)?body.language:"both";
@@ -105,8 +120,8 @@ export async function onRequestDelete({ request, env }) {
   const session = await admin(request, env);
   if (!session) return json({error:"Your session or security token has expired."},403);
   const url=new URL(request.url), kind=url.searchParams.get("kind"), id=Number(url.searchParams.get("id"));
-  if(!Number.isInteger(id)||id<1||!["announcement","schedule"].includes(kind)) return json({error:"Invalid delete request."},400);
-  const table=kind==="announcement"?"announcements":"mass_schedules";
+  if(!Number.isInteger(id)||id<1||!["announcement","schedule","special_occasion"].includes(kind)) return json({error:"Invalid delete request."},400);
+  const table=kind==="announcement"?"announcements":kind==="schedule"?"mass_schedules":"special_occasions";
   try {
     await env.CHRISTTHEKING_DB.prepare("DELETE FROM "+table+" WHERE id=?").bind(id).run();
     await env.CHRISTTHEKING_DB.prepare("INSERT INTO audit_logs (actor,action,entity_type,entity_id,created_at) VALUES (?,'delete',?,?,?)").bind(session.username,table,String(id),new Date().toISOString()).run();

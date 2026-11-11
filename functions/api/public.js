@@ -6,11 +6,12 @@ export async function onRequestGet({request,env}) {
   try {
     if(kind==="content") {
       const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-      const [ann,schedules]=await Promise.all([
+      const [ann,schedules,specialOccasions]=await Promise.all([
         env.CHRISTTHEKING_DB.prepare("SELECT id,title_en,title_la,body_en,body_la,starts_on,ends_on FROM announcements WHERE published=1 AND (starts_on IS NULL OR starts_on<=?) AND (ends_on IS NULL OR ends_on>=?) ORDER BY starts_on,id DESC").bind(today,today).all(),
-        env.CHRISTTHEKING_DB.prepare("SELECT id,title_en,title_la,details_en,details_la,weekday,specific_date,start_time,sort_order FROM mass_schedules WHERE active=1 ORDER BY sort_order,weekday,specific_date,id").all()
+        env.CHRISTTHEKING_DB.prepare("SELECT id,title_en,title_la,details_en,details_la,weekday,specific_date,start_time,sort_order FROM mass_schedules WHERE active=1 ORDER BY sort_order,weekday,specific_date,id").all(),
+        env.CHRISTTHEKING_DB.prepare("SELECT id,title_en,title_la,details_en,details_la,starts_on,ends_on,sort_order FROM special_occasions WHERE active=1 AND (starts_on IS NULL OR starts_on>=?) ORDER BY sort_order,starts_on,id").bind(today).all()
       ]);
-      return json({announcements:ann.results||[],schedules:schedules.results||[]});
+      return json({announcements:ann.results||[],schedules:schedules.results||[],specialOccasions:specialOccasions.results||[]});
     }
     if(kind==="feast") {
       const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());

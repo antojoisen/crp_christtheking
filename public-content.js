@@ -11,6 +11,8 @@
     const grid=document.querySelector(".schedule-grid");
     if(grid)grid.innerHTML=d.schedules.map(x=>'<div class="schedule-card"><h3>'+esc(x.title_en)+'</h3>'+String(x.details_en||"").split("\n").filter(Boolean).map(t=>"<p>"+esc(t)+"</p>").join("")+'</div>').join("");
    }
+   const specialPanel=document.getElementById("special");
+   if(specialPanel){const occasions=Array.isArray(d.specialOccasions)?d.specialOccasions:[];specialPanel.innerHTML=occasions.length?occasions.map(x=>'<div class="schedule-card full-width"><h3>'+esc(x.title_en)+'</h3>'+String(x.details_en||"").split("\n").filter(Boolean).map(t=>"<p>"+esc(t)+"</p>").join("")+(x.starts_on?'<p class="small">'+esc(x.starts_on)+(x.ends_on&&x.ends_on!==x.starts_on?" – "+esc(x.ends_on):"")+"</p>":"")+"</div>").join(""):'<div class="schedule-card full-width"><h3>Upcoming Special Occasions</h3><p>No special occasions scheduled at this moment. Please check back later for updates on feast days, Holy Week schedules, and other special Masses.</p></div>';}
    if(Array.isArray(d.announcements)&&d.announcements.length){
     const box=document.getElementById("public-announcements"),list=document.getElementById("public-announcement-list");
     if(box&&list){list.innerHTML=d.announcements.map(x=>'<article style="margin-bottom:14px"><h4>'+esc(x.title_en)+'</h4><p>'+esc(x.body_en).replace(/\n/g,"<br>")+'</p></article>').join("");box.style.display="block";}

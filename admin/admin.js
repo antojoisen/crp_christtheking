@@ -18,6 +18,7 @@ function activateView(name){document.querySelectorAll(".admin-nav button").forEa
 document.querySelectorAll(".admin-nav button").forEach(b=>b.addEventListener("click",()=>activateView(b.dataset.view)));
 $("open-propers").addEventListener("click",()=>activateView("propers"));
 $("open-schedules").addEventListener("click",()=>activateView("schedules"));
+$("open-special").addEventListener("click",()=>activateView("special"));
 async function initialize(){try{const s=await api("../api/auth/me");if(s.authenticated){showDashboard();return;}}catch{}showLogin();}
 $("login-form").addEventListener("submit",async e=>{e.preventDefault();$("auth-message").textContent="Signing in…";try{await api("../api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("username").value,password:$("password").value})});$("password").value="";showDashboard();}catch(err){$("auth-message").textContent=err.message;}});
 $("logout").addEventListener("click",async()=>{try{await api("../api/auth/logout",{method:"POST"});}catch{}showLogin("You have been signed out.");});

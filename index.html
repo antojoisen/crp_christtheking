@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Christ the King Church | Traditional Latin Mass</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/webp" href="assets/church-logo.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script defer src="script.js"></script>
     <script defer src="saints.js"></script>
@@ -14,13 +15,13 @@
     <header id="navbar">
         <div class="container nav-content">
             <div class="logo-container">
-                <div class="logo-text">
-                    <h1 style="display: flex; align-items: center; gap: 10px;">
-                        <span style="color: var(--secondary-color); font-size: 1.8rem;">&dagger;</span> 
-                        Christ the King
-                    </h1>
-                    <span>Catholic Church</span>
-                </div>
+                <a class="brand-link" href="#home" aria-label="Christ the King Church home">
+                    <img class="church-logo" src="assets/church-logo.webp" alt="Christ the King Church, Christurajapuram">
+                    <span class="logo-text">
+                        <strong>Christ the King</strong>
+                        <span>Catholic Church</span>
+                    </span>
+                </a>
             </div>
             <nav>
                 <ul class="nav-links">

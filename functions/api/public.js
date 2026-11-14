@@ -15,14 +15,15 @@ export async function onRequestGet({request,env}) {
     }
     if(kind==="feast") {
       const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-      const [calendar,propers]=await Promise.all([
+      const [calendar,propers,overrideRows]=await Promise.all([
         env.CHRISTTHEKING_DB.prepare("SELECT raw_ordo_json,synced_at FROM liturgical_days WHERE liturgical_date=?").bind(today).first(),
-        env.CHRISTTHEKING_DB.prepare("SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language").bind(today).all()
+        env.CHRISTTHEKING_DB.prepare("SELECT language,raw_texts_json,synced_at,missing_json FROM mass_propers WHERE liturgical_date=? ORDER BY language").bind(today).all(),
+        env.CHRISTTHEKING_DB.prepare("SELECT field_key,language,value,reason,updated_at FROM admin_overrides WHERE liturgical_date=?").bind(today).all()
       ]);
       const dayData=calendar?JSON.parse(calendar.raw_ordo_json):null;
       const items={};
       for(const row of (propers.results||[]))items[row.language]={data:JSON.parse(row.raw_texts_json),syncedAt:row.synced_at,missing:JSON.parse(row.missing_json||"[]")};
-      return json({date:today,calendar:dayData,propers:items,available:Object.keys(items)});
+      return json({date:today,calendar:dayData,overrides:overrideRows.results||[],propers:items,available:Object.keys(items)});
     }
     if(kind==="propers") {
       const date=url.searchParams.get("date");
@@ -40,8 +41,12 @@ export async function onRequestGet({request,env}) {
       if(!Number.isInteger(year)||year<1900||year>2200||!Number.isInteger(month)||month<1||month>12) return json({error:"Invalid month."},400);
       const start=year+"-"+String(month).padStart(2,"0")+"-01";
       const end=new Date(Date.UTC(year,month,1)).toISOString().slice(0,10);
-      const result=await env.CHRISTTHEKING_DB.prepare("SELECT liturgical_date,raw_ordo_json,synced_at FROM liturgical_days WHERE liturgical_date>=? AND liturgical_date<? ORDER BY liturgical_date").bind(start,end).all();
-      return json({days:(result.results||[]).map(r=>({date:r.liturgical_date,data:JSON.parse(r.raw_ordo_json)})),count:result.results?.length||0});
+      const [result,overrideResult]=await Promise.all([
+        env.CHRISTTHEKING_DB.prepare("SELECT liturgical_date,raw_ordo_json,synced_at FROM liturgical_days WHERE liturgical_date>=? AND liturgical_date<? ORDER BY liturgical_date").bind(start,end).all(),
+        env.CHRISTTHEKING_DB.prepare("SELECT liturgical_date,field_key,language,value FROM admin_overrides WHERE liturgical_date>=? AND liturgical_date<?").bind(start,end).all()
+      ]);
+      const grouped={};for(const item of (overrideResult.results||[]))(grouped[item.liturgical_date]||=[]).push(item);
+      return json({days:(result.results||[]).map(r=>({date:r.liturgical_date,data:JSON.parse(r.raw_ordo_json),overrides:grouped[r.liturgical_date]||[]})),count:result.results?.length||0});
     }
     return json({error:"Unknown request."},400);
   } catch(error) {

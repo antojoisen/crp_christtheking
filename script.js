@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Tab Logic for Schedule
-function openTab(tabId) {
+function openTab(tabId, trigger) {
     const contents = document.querySelectorAll('.tab-content');
     const buttons = document.querySelectorAll('.tab-btn');
     
@@ -46,5 +46,6 @@ function openTab(tabId) {
     
     document.getElementById(tabId).style.display = 'block';
     setTimeout(() => document.getElementById(tabId).classList.add('active'), 50);
-    event.currentTarget.classList.add('active');
+    const activeButton = trigger || document.querySelector('.tab-btn[onclick*="' + tabId + '"]');
+    if (activeButton) activeButton.classList.add('active');
 }

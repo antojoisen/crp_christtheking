@@ -20,7 +20,8 @@
   }
   if(feast.ok){
    const data=await feast.json(),en=data.calendar?.en?.day||data.calendar?.en,la=data.calendar?.la?.day||data.calendar?.la;
-   const name=en?.celebration?.name||la?.celebration?.name||"Liturgical celebration";
+   const override=data.overrides?.find(o=>o.field_key==="celebration.name"&&(o.language==="en"||o.language==="both"))?.value;
+   const name=override||en?.celebration?.name||la?.celebration?.name||"Liturgical celebration";
    const clean=s=>String(s||"").replace(/<[^>]*>/g,"").replace(/&nbsp;/g," ").trim();
    const date=new Date(data.date+"T12:00:00");
    const dateText=date.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});

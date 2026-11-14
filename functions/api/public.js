@@ -35,9 +35,10 @@ export async function onRequestGet({request,env}) {
       return json({date:today,items,available:Object.keys(items)});
     }
     if(kind==="calendar") {
-      const now=new Date();
-      const year=Number(url.searchParams.get("year")||now.getFullYear());
-      const month=Number(url.searchParams.get("month")||now.getMonth()+1);
+      const localParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit"}).formatToParts(new Date());
+      const localYear=Number(localParts.find(p=>p.type==="year")?.value),localMonth=Number(localParts.find(p=>p.type==="month")?.value);
+      const year=Number(url.searchParams.get("year")||localYear);
+      const month=Number(url.searchParams.get("month")||localMonth);
       if(!Number.isInteger(year)||year<1900||year>2200||!Number.isInteger(month)||month<1||month>12) return json({error:"Invalid month."},400);
       const start=year+"-"+String(month).padStart(2,"0")+"-01";
       const end=new Date(Date.UTC(year,month,1)).toISOString().slice(0,10);

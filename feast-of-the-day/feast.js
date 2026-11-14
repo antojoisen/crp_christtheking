@@ -41,7 +41,8 @@ async function load(){
  try{
   const r=await fetch("../api/public?kind=feast",{cache:"no-store"}),d=await r.json();if(!r.ok)throw new Error(d.error||"Unable to load today’s feast.");
   const en=d.calendar?.en?.day||d.calendar?.en,la=d.calendar?.la?.day||d.calendar?.la;
-  const name=en?.celebration?.name||la?.celebration?.name||"Liturgical celebration",date=new Date(d.date+"T12:00:00");
+  const override=(lang)=>d.overrides?.find(o=>o.field_key==="celebration.name"&&(o.language===lang||o.language==="both"))?.value;
+  const name=override("en")||override("la")||en?.celebration?.name||la?.celebration?.name||"Liturgical celebration",date=new Date(d.date+"T12:00:00");
   $("feast-date").textContent=date.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).toUpperCase();
   $("feast-title").textContent=clean(name);
   const rank=en?.celebration?.rank||la?.celebration?.rank,color=en?.celebration?.color||la?.celebration?.color;
